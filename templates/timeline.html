@@ -81,6 +81,9 @@
         <div class="row justify-content-center mt-4">
             <div class="col-md-6 col-lg-5">
                 <select id="state-selector" class="form-select form-select-lg shadow-sm border-primary">
+                    <optgroup label="Ongoing Elections">
+                        <option value="west_bengal_2024">West Bengal (2024 Lok Sabha)</option>
+                    </optgroup>
                     <optgroup label="Upcoming Elections">
                         <option value="general">2026 General Elections (National)</option>
                         <option value="maharashtra">Maharashtra State Assembly (2026)</option>
@@ -132,6 +135,20 @@
 {% block scripts %}
 <script>
     const electionData = {
+        // --- ONGOING ---
+        "west_bengal_2024": {
+            title: "West Bengal Lok Sabha 2024",
+            date: "June 4, 2024 08:00:00",
+            status: "ongoing",
+            events: [
+                { date: "March 16, 2024", title: "Election Announced", desc: "ECI announces 7-phase voting for 42 Lok Sabha seats.", color: "primary" },
+                { date: "April 19, 2024", title: "Phase 1 Voting", desc: "Voting begins for Cooch Behar, Alipurduars, and Jalpaiguri.", color: "success" },
+                { date: "May 25, 2024", title: "Phase 6 Voting", desc: "Polling held across 8 constituencies.", color: "success" },
+                { date: "June 1, 2024", title: "Final Phase Voting", desc: "7th phase voting concludes the election process.", color: "warning" },
+                { date: "June 4, 2024", title: "Results Day", desc: "Nationwide counting of votes and final declaration of results.", color: "info" }
+            ]
+        },
+
         // --- UPCOMING ---
         "general": {
             title: "2026 General Elections",
@@ -279,6 +296,19 @@
                     <div class="card-body py-4">
                         <h3 class='text-success fw-bold mb-2'><i class="bi bi-check-circle-fill"></i> Election Completed</h3>
                         <p class="mb-0 text-dark">The democratic process has concluded. See the timeline below for the final results and historical dates.</p>
+                    </div>
+                </div>
+            `;
+            return;
+        } else if (data.status === 'ongoing') {
+            countdownDiv.innerHTML = `
+                <div class="card border-primary border-2 shadow-sm bg-primary-subtle w-100 mt-2">
+                    <div class="card-body py-4">
+                        <h3 class='text-primary fw-bold mb-2'>
+                            <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
+                            Election is Ongoing
+                        </h3>
+                        <p class="mb-0 text-dark">Voting or counting is currently in progress. Check the timeline for the latest scheduled events.</p>
                     </div>
                 </div>
             `;
