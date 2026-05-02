@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5 mt-4">
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6 mb-4 mb-lg-0 text-center text-lg-start animate-fade-in">
+            <h1 class="display-4 fw-bold mb-3">Your Smart Guide to <span class="text-gradient">Voting in India</span></h1>
+            <p class="lead mb-4 text-muted">A simple, guided, and interactive assistant to help first-time voters understand the election process without the confusion.</p>
+            <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                <a href="/eligibility" class="btn btn-primary-custom btn-lg">Check Eligibility <i class="bi bi-arrow-right"></i></a>
+                <a href="/journey" class="btn btn-outline-custom btn-lg">Start Journey</a>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center animate-fade-in" style="animation-delay: 0.2s;">
+            <img src="https://illustrations.popsy.co/amber/student-going-to-school.svg" alt="Voting Guide" class="img-fluid" style="max-height: 400px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));">
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12 mb-4 text-center">
+            <h2 class="fw-bold">Everything you need in one place</h2>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="glass-card p-4 h-100 text-center animate-fade-in" style="animation-delay: 0.3s;">
+                <div class="display-5 text-primary mb-3"><i class="bi bi-person-badge"></i></div>
+                <h4 class="fw-bold">Eligibility & Docs</h4>
+                <p class="text-muted">Know if you can vote and what documents are accepted at the polling booth.</p>
+                <a href="/documents" class="text-decoration-none fw-bold">View Guide <i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="glass-card p-4 h-100 text-center animate-fade-in" style="animation-delay: 0.4s;">
+                <div class="display-5 text-success mb-3"><i class="bi bi-signpost-split"></i></div>
+                <h4 class="fw-bold">Step-by-Step Journey</h4>
+                <p class="text-muted">A personalized roadmap tracking your progress from registration to voting day.</p>
+                <a href="/journey" class="text-decoration-none fw-bold text-success">Track Progress <i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="glass-card p-4 h-100 text-center animate-fade-in" style="animation-delay: 0.5s;">
+                <div class="display-5 text-warning mb-3"><i class="bi bi-geo-alt"></i></div>
+                <h4 class="fw-bold">Find Polling Booth</h4>
+                <p class="text-muted">Enter your PIN code to instantly locate your nearest polling station.</p>
+                <a href="/booth" class="text-decoration-none fw-bold text-warning">Find Now <i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

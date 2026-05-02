@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    background-color: var(--border-color);
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -2px;
+}
+.timeline-item {
+    padding: 10px 40px;
+    position: relative;
+    background-color: inherit;
+    width: 50%;
+}
+.timeline-item.left { left: 0; }
+.timeline-item.right { left: 50%; }
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    right: -10px;
+    background-color: var(--card-bg);
+    border: 4px solid var(--primary-color);
+    top: 25px;
+    border-radius: 50%;
+    z-index: 1;
+}
+.timeline-item.right::after {
+    left: -10px;
+}
+.timeline-content {
+    padding: 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow);
+}
+@media screen and (max-width: 600px) {
+    .timeline::after { left: 31px; }
+    .timeline-item { width: 100%; padding-left: 70px; padding-right: 25px; }
+    .timeline-item.right { left: 0; }
+    .timeline-item.left::after, .timeline-item.right::after { left: 21px; }
+}
+
+#countdown {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+.time-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px 25px;
+    text-align: center;
+    min-width: 100px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.time-value { font-size: 2.5rem; font-weight: 700; color: var(--primary-color); line-height: 1; }
+.time-label { font-size: 0.85rem; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+</style>
+
+<div class="container py-5">
+    <div class="text-center mb-5 animate-fade-in">
+        <h2 class="fw-bold"><i class="bi bi-calendar-event text-primary"></i> Election Timeline</h2>
+        <p class="text-muted">Keep track of important dates for upcoming elections in your state.</p>
+        
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6 col-lg-5">
+                <select id="state-selector" class="form-select form-select-lg shadow-sm border-primary">
+                    <optgroup label="Upcoming Elections">
+                        <option value="general">2026 General Elections (National)</option>
+                        <option value="maharashtra">Maharashtra State Assembly (2026)</option>
+                        <option value="karnataka_upcoming">Karnataka State Assembly (2027)</option>
+                        <option value="delhi">Delhi State Assembly (2027)</option>
+                        <option value="up">Uttar Pradesh State Assembly (2027)</option>
+                    </optgroup>
+                    <optgroup label="Recently Completed (Past 2 Years)">
+                        <option value="telangana_2023">Telangana State Assembly (2023)</option>
+                        <option value="mp_2023">Madhya Pradesh State Assembly (2023)</option>
+                        <option value="rajasthan_2023">Rajasthan State Assembly (2023)</option>
+                        <option value="karnataka_2023">Karnataka State Assembly (2023)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="mb-5 animate-fade-in" style="animation-delay: 0.2s;" id="countdown-wrapper">
+        <h4 class="text-center mb-4 fw-bold" id="countdown-title">Time left until Election Day</h4>
+        <div id="countdown">
+            <div class="time-box">
+                <div class="time-value" id="days">00</div>
+                <div class="time-label">Days</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="hours">00</div>
+                <div class="time-label">Hours</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="mins">00</div>
+                <div class="time-label">Mins</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="secs">00</div>
+                <div class="time-label">Secs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline animate-fade-in" style="animation-delay: 0.4s;" id="timeline-container">
+        <!-- Timeline items will be injected here -->
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const electionData = {
+        // --- UPCOMING ---
+        "general": {
+            title: "2026 General Elections",
+            date: "April 20, 2026 08:00:00",
+            status: "upcoming",
+            events: [
+                { date: "January 1, 2026", title: "Qualifying Date", desc: "Must be 18 years old on or before this date to vote.", color: "primary" },
+                { date: "March 15, 2026", title: "Registration Deadline", desc: "Last date to submit Form 6 to get on the electoral roll.", color: "warning" },
+                { date: "April 20, 2026", title: "Election Day", desc: "Go to your designated polling booth and cast your vote!", color: "success" },
+                { date: "May 10, 2026", title: "Results Announced", desc: "Counting of votes and declaration of the final results.", color: "info" }
+            ]
+        },
+        "maharashtra": {
+            title: "Maharashtra State Assembly",
+            date: "October 15, 2026 08:00:00",
+            status: "upcoming",
+            events: [
+                { date: "August 1, 2026", title: "Voter List Update", desc: "Final publication of the updated state voter list.", color: "primary" },
+                { date: "September 10, 2026", title: "Nomination Deadline", desc: "Last day for candidates to file their nominations.", color: "warning" },
+                { date: "October 15, 2026", title: "Voting Day", desc: "Single-phase voting across all constituencies in Maharashtra.", color: "success" },
+                { date: "October 20, 2026", title: "Counting Day", desc: "Results declared for the Vidhan Sabha.", color: "info" }
+            ]
+        },
+        "karnataka_upcoming": {
+            title: "Karnataka State Assembly",
+            date: "May 12, 2027 08:00:00",
+            status: "upcoming",
+            events: [
+                { date: "March 1, 2027", title: "Poll Notification", desc: "Official gazette notification for the state elections.", color: "primary" },
+                { date: "April 5, 2027", title: "Campaign Ends", desc: "Silent period begins 48 hours before voting.", color: "warning" },
+                { date: "May 12, 2027", title: "Election Day", desc: "Cast your vote for the Karnataka Legislative Assembly.", color: "success" },
+                { date: "May 15, 2027", title: "Results", desc: "Vote counting and final tally.", color: "info" }
+            ]
+        },
+        "delhi": {
+            title: "Delhi State Assembly",
+            date: "February 8, 2027 08:00:00",
+            status: "upcoming",
+            events: [
+                { date: "December 15, 2026", title: "Roll Revision", desc: "Special summary revision of electoral rolls.", color: "primary" },
+                { date: "January 20, 2027", title: "Candidate Finalization", desc: "Withdrawal of candidatures ends.", color: "warning" },
+                { date: "February 8, 2027", title: "Voting Day", desc: "Delhi goes to the polls.", color: "success" },
+                { date: "February 11, 2027", title: "Verdict Day", desc: "Results for all 70 assembly seats.", color: "info" }
+            ]
+        },
+        "up": {
+            title: "Uttar Pradesh State Assembly",
+            date: "February 10, 2027 08:00:00",
+            status: "upcoming",
+            events: [
+                { date: "January 5, 2027", title: "Phase 1 Notification", desc: "First phase of the multi-phase UP elections announced.", color: "primary" },
+                { date: "February 10, 2027", title: "Phase 1 Voting", desc: "Voting begins for the first set of constituencies.", color: "success" },
+                { date: "March 7, 2027", title: "Final Phase Voting", desc: "The 7th and final phase of voting concludes.", color: "success" },
+                { date: "March 10, 2027", title: "Results Declared", desc: "Mega counting day for the UP Vidhan Sabha.", color: "info" }
+            ]
+        },
+
+        // --- COMPLETED ---
+        "telangana_2023": {
+            title: "Telangana State Assembly 2023",
+            date: "November 30, 2023 08:00:00",
+            status: "completed",
+            events: [
+                { date: "October 9, 2023", title: "Election Scheduled", desc: "ECI announces the schedule for the Telangana assembly elections.", color: "primary" },
+                { date: "November 3, 2023", title: "Gazette Notification", desc: "Official notification issued; nominations begin.", color: "warning" },
+                { date: "November 30, 2023", title: "Voting Day", desc: "Over 71% voter turnout recorded across 119 constituencies.", color: "success" },
+                { date: "December 3, 2023", title: "Final Results", desc: "INC wins 64 seats, forming the government. BRS wins 39 seats.", color: "info" }
+            ]
+        },
+        "mp_2023": {
+            title: "Madhya Pradesh State Assembly 2023",
+            date: "November 17, 2023 08:00:00",
+            status: "completed",
+            events: [
+                { date: "October 9, 2023", title: "Election Scheduled", desc: "ECI announces single-phase elections for MP.", color: "primary" },
+                { date: "October 30, 2023", title: "Nomination Deadline", desc: "Last day to file candidate nominations.", color: "warning" },
+                { date: "November 17, 2023", title: "Voting Day", desc: "High voter turnout of 77.15% recorded for 230 seats.", color: "success" },
+                { date: "December 3, 2023", title: "Final Results", desc: "BJP wins decisively with 163 seats. INC secures 66 seats.", color: "info" }
+            ]
+        },
+        "rajasthan_2023": {
+            title: "Rajasthan State Assembly 2023",
+            date: "November 25, 2023 08:00:00",
+            status: "completed",
+            events: [
+                { date: "October 9, 2023", title: "Election Scheduled", desc: "Schedule announced for 200 assembly constituencies.", color: "primary" },
+                { date: "November 6, 2023", title: "Nomination Deadline", desc: "Candidate filing window closes.", color: "warning" },
+                { date: "November 25, 2023", title: "Voting Day", desc: "Voting conducted with a 74.62% turnout.", color: "success" },
+                { date: "December 3, 2023", title: "Final Results", desc: "BJP wins 115 seats to form the government. INC wins 69 seats.", color: "info" }
+            ]
+        },
+        "karnataka_2023": {
+            title: "Karnataka State Assembly 2023",
+            date: "May 10, 2023 08:00:00",
+            status: "completed",
+            events: [
+                { date: "March 29, 2023", title: "Election Scheduled", desc: "ECI announces the schedule for the 15th Karnataka Assembly.", color: "primary" },
+                { date: "April 20, 2023", title: "Nomination Deadline", desc: "Final day for candidate submissions.", color: "warning" },
+                { date: "May 10, 2023", title: "Voting Day", desc: "Single phase polling held across 224 constituencies.", color: "success" },
+                { date: "May 13, 2023", title: "Final Results", desc: "INC wins a clear majority with 135 seats. BJP secures 66 seats.", color: "info" }
+            ]
+        }
+    };
+
+    let countdownInterval;
+
+    function renderTimeline(stateKey) {
+        const data = electionData[stateKey];
+        
+        // Update Title
+        if(data.status === 'completed') {
+            document.getElementById('countdown-title').innerText = `Results for ${data.title}`;
+        } else {
+            document.getElementById('countdown-title').innerText = `Time left until ${data.title} Day`;
+        }
+        
+        // Render Timeline Events
+        const container = document.getElementById('timeline-container');
+        container.innerHTML = '';
+        
+        data.events.forEach((ev, idx) => {
+            const side = idx % 2 === 0 ? 'left' : 'right';
+            const html = `
+                <div class="timeline-item ${side}">
+                    <div class="timeline-content">
+                        <h5 class="fw-bold text-${ev.color}">${ev.date}</h5>
+                        <h6 class="fw-bold mb-2">${ev.title}</h6>
+                        <p class="text-muted mb-0">${ev.desc}</p>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+
+        // Setup Countdown / Completed state
+        if (countdownInterval) clearInterval(countdownInterval);
+        
+        const targetDate = new Date(data.date).getTime();
+        const countdownWrapper = document.getElementById("countdown-wrapper");
+        const countdownDiv = document.getElementById("countdown");
+        
+        if (data.status === 'completed') {
+            countdownDiv.innerHTML = `
+                <div class="card border-success border-2 shadow-sm bg-success-subtle w-100 mt-2">
+                    <div class="card-body py-4">
+                        <h3 class='text-success fw-bold mb-2'><i class="bi bi-check-circle-fill"></i> Election Completed</h3>
+                        <p class="mb-0 text-dark">The democratic process has concluded. See the timeline below for the final results and historical dates.</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Reset HTML if it was showing 'Election Completed' or 'Election Day is Here'
+        countdownDiv.innerHTML = `
+            <div class="time-box"><div class="time-value" id="days">00</div><div class="time-label">Days</div></div>
+            <div class="time-box"><div class="time-value" id="hours">00</div><div class="time-label">Hours</div></div>
+            <div class="time-box"><div class="time-value" id="mins">00</div><div class="time-label">Mins</div></div>
+            <div class="time-box"><div class="time-value" id="secs">00</div><div class="time-label">Secs</div></div>
+        `;
+
+        countdownInterval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                countdownDiv.innerHTML = "<h3 class='text-success fw-bold'>Election Day is Here!</h3>";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const dEl = document.getElementById("days");
+            if(dEl) {
+                dEl.innerHTML = days < 10 ? '0'+days : days;
+                document.getElementById("hours").innerHTML = hours < 10 ? '0'+hours : hours;
+                document.getElementById("mins").innerHTML = minutes < 10 ? '0'+minutes : minutes;
+                document.getElementById("secs").innerHTML = seconds < 10 ? '0'+seconds : seconds;
+            }
+        }, 1000);
+    }
+
+    document.getElementById('state-selector').addEventListener('change', (e) => {
+        renderTimeline(e.target.value);
+    });
+
+    // Init with general
+    renderTimeline('general');
+</script>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5 animate-fade-in">
+        <h2 class="fw-bold"><i class="bi bi-map-fill text-success"></i> Your Voting Journey</h2>
+        <p class="text-muted">Follow these steps to become a proud voter.</p>
+        
+        <div class="progress-custom mt-4 mx-auto w-75">
+            <div class="progress-bar-custom" id="journey-progress" style="width: 0%"></div>
+        </div>
+        <p class="mt-2 fw-bold text-gradient" id="progress-text">0% Completed</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div id="steps-container" class="d-flex flex-column gap-4">
+                
+                <!-- Step 1 -->
+                <div class="glass-card p-4 step-card" id="card-step1">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="fw-bold mb-0">1. Check Eligibility</h4>
+                        <div class="form-check form-switch form-switch-lg fs-4">
+                            <input class="form-check-input" type="checkbox" id="chk-step1" data-step="step1">
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">Before you begin, make sure you legally qualify to vote in India.</p>
+                    <ul class="text-muted small mb-3">
+                        <li>Must be an Indian Citizen.</li>
+                        <li>Must be 18 years or older on the qualifying date (typically Jan 1st).</li>
+                        <li>Must be a resident of the polling area where you wish to enroll.</li>
+                    </ul>
+                    <a href="/eligibility" class="btn btn-sm btn-outline-custom"><i class="bi bi-person-check-fill"></i> Check My Eligibility Now</a>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="glass-card p-4 step-card" id="card-step2">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="fw-bold mb-0">2. Register as Voter (Form 6)</h4>
+                        <div class="form-check form-switch form-switch-lg fs-4">
+                            <input class="form-check-input" type="checkbox" id="chk-step2" data-step="step2">
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">You need to register your name in the Electoral Roll by filling out <strong>Form 6</strong>.</p>
+                    <ol class="text-muted small mb-3">
+                        <li>Visit the <a href="https://voters.eci.gov.in/" target="_blank" class="text-primary fw-bold text-decoration-none">Official Voter Portal (voters.eci.gov.in)</a>.</li>
+                        <li>Create an account using your mobile number.</li>
+                        <li>Select "Fill Form 6" for new voter registration.</li>
+                        <li>Upload your photo, address proof (Aadhaar/Passport), and age proof.</li>
+                        <li>Submit and note down your reference number to track the status.</li>
+                    </ol>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="glass-card p-4 step-card" id="card-step3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="fw-bold mb-0">3. Obtain Voter ID (EPIC)</h4>
+                        <div class="form-check form-switch form-switch-lg fs-4">
+                            <input class="form-check-input" type="checkbox" id="chk-step3" data-step="step3">
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">Once your Form 6 is approved, an EPIC (Electors Photo Identity Card) number is generated.</p>
+                    <ul class="text-muted small mb-0">
+                        <li><strong>Digital Copy:</strong> You can download your e-EPIC immediately from the portal once approved.</li>
+                        <li><strong>Physical Copy:</strong> The physical PVC card will be delivered to your registered address via Speed Post.</li>
+                    </ul>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="glass-card p-4 step-card" id="card-step4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="fw-bold mb-0">4. Find Your Polling Booth</h4>
+                        <div class="form-check form-switch form-switch-lg fs-4">
+                            <input class="form-check-input" type="checkbox" id="chk-step4" data-step="step4">
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">A few days before the election, confirm exactly where you need to go.</p>
+                    <ul class="text-muted small mb-3">
+                        <li>Check your "Part Number" and "Serial Number" on the electoral roll.</li>
+                        <li>Locate your designated polling station.</li>
+                    </ul>
+                    <a href="/booth" class="btn btn-sm btn-outline-custom"><i class="bi bi-geo-alt-fill"></i> Use Booth Finder</a>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="glass-card p-4 step-card" id="card-step5">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="fw-bold mb-0">5. Voting Day!</h4>
+                        <div class="form-check form-switch form-switch-lg fs-4">
+                            <input class="form-check-input" type="checkbox" id="chk-step5" data-step="step5">
+                        </div>
+                    </div>
+                    <p class="text-muted mb-3">It's time to exercise your democratic right.</p>
+                    <ol class="text-muted small mb-3">
+                        <li>Carry your original Voter ID (or an <a href="/documents" class="text-primary text-decoration-none">approved alternate document</a>).</li>
+                        <li>Stand in line at your booth. Polling officials will check your ID.</li>
+                        <li>They will mark your finger with indelible ink.</li>
+                        <li>Proceed to the EVM (Electronic Voting Machine).</li>
+                        <li>Press the blue button next to your chosen candidate. Wait for the red light and the "beep" sound!</li>
+                    </ol>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const checkboxes = document.querySelectorAll('.form-check-input');
+    const progressBar = document.getElementById('journey-progress');
+    const progressText = document.getElementById('progress-text');
+
+    function updateUI(data) {
+        let completed = 0;
+        let firstIncomplete = null;
+
+        ['step1', 'step2', 'step3', 'step4', 'step5'].forEach((step, idx) => {
+            const isDone = data && data[step] === 1;
+            const chk = document.getElementById(`chk-${step}`);
+            const card = document.getElementById(`card-${step}`);
+            
+            if (chk) chk.checked = isDone;
+            
+            card.classList.remove('active-step', 'completed-step');
+            
+            if (isDone) {
+                completed++;
+                card.classList.add('completed-step');
+            } else if (!firstIncomplete) {
+                firstIncomplete = card;
+                card.classList.add('active-step');
+            }
+        });
+
+        const percent = (completed / 5) * 100;
+        progressBar.style.width = `${percent}%`;
+        progressText.innerText = `${percent}% Completed`;
+    }
+
+    // Initial fetch
+    const data = await fetchProgress();
+    if(data) updateUI(data);
+
+    // Handle clicks
+    checkboxes.forEach(chk => {
+        chk.addEventListener('change', async (e) => {
+            const step = e.target.getAttribute('data-step');
+            const status = e.target.checked;
+            
+            // Optimistic UI update
+            const card = document.getElementById(`card-${step}`);
+            if(status) {
+                card.classList.add('completed-step');
+                card.classList.remove('active-step');
+            } else {
+                card.classList.remove('completed-step');
+            }
+            
+            await updateProgress(step, status);
+            const newData = await fetchProgress();
+            if(newData) updateUI(newData);
+        });
+    });
+});
+</script>
+{% endblock %}

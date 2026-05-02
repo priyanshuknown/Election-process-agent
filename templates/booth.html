@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="glass-card p-5 text-center animate-fade-in">
+                <h2 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-warning"></i> Find Your Polling Booth</h2>
+                <p class="text-muted mb-4">Enter your 6-digit PIN code to find the nearest polling station.</p>
+                
+                <div class="input-group input-group-lg mb-3 shadow-sm rounded">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="pincode-input" class="form-control border-start-0 ps-0" placeholder="e.g. 110001" maxlength="6">
+                    <button class="btn btn-primary-custom" type="button" id="search-btn">Search</button>
+                </div>
+                <div id="error-msg" class="text-danger small text-start d-none">Please enter a valid 6-digit PIN.</div>
+
+                <!-- Results -->
+                <div id="booth-result-container" class="mt-4 d-none">
+                    <h5 class="text-start mb-3 fw-bold text-success" id="result-count"><i class="bi bi-check-circle-fill me-2"></i> Booths Found</h5>
+                    <div id="booth-list" class="d-flex flex-column gap-3">
+                        <!-- Booths will be injected here -->
+                    </div>
+                </div>
+                
+                <!-- Loading -->
+                <div id="loading" class="mt-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted small">Searching database...</p>
+                </div>
+
+            </div>
+            
+            <div class="mt-4 text-center">
+                <p class="text-muted small"><i class="bi bi-info-circle"></i> Don't know your PIN? You can also search by EPIC No. on the official portal.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('search-btn').addEventListener('click', async () => {
+    const pincode = document.getElementById('pincode-input').value;
+    const errorMsg = document.getElementById('error-msg');
+    const resultContainer = document.getElementById('booth-result-container');
+    const boothList = document.getElementById('booth-list');
+    const loading = document.getElementById('loading');
+    
+    errorMsg.classList.add('d-none');
+    resultContainer.classList.add('d-none');
+    boothList.innerHTML = ''; // Clear previous results
+    
+    if(!pincode || pincode.length !== 6 || isNaN(pincode)) {
+        errorMsg.classList.remove('d-none');
+        return;
+    }
+    
+    loading.classList.remove('d-none');
+    
+    try {
+        const res = await fetch('/api/booth', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({pincode: pincode})
+        });
+        const data = await res.json();
+        
+        loading.classList.add('d-none');
+        
+        if(data.found && data.booths && data.booths.length > 0) {
+            document.getElementById('result-count').innerHTML = `<i class="bi bi-check-circle-fill me-2"></i> Found ${data.booths.length} Booth(s) near ${pincode}`;
+            
+            data.booths.forEach(booth => {
+                const mapQuery = encodeURIComponent(`${booth.name}, ${booth.address}`);
+                const mapLink = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+                
+                const boothCard = document.createElement('div');
+                boothCard.className = 'card border-0 shadow-sm rounded-4 overflow-hidden text-start';
+                boothCard.innerHTML = `
+                    <div class="card-body p-4 bg-white text-dark">
+                        <h5 class="fw-bold text-primary mb-1">${booth.name}</h5>
+                        <p class="text-muted mb-3 small"><i class="bi bi-geo"></i> ${booth.address}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-light text-dark border"><i class="bi bi-signpost-2"></i> Distance: <span>${booth.distance}</span></span>
+                            <a href="${mapLink}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="bi bi-map"></i> Get Directions</a>
+                        </div>
+                    </div>
+                `;
+                boothList.appendChild(boothCard);
+            });
+            
+            resultContainer.classList.remove('d-none');
+            resultContainer.classList.add('animate-fade-in');
+        } else {
+            errorMsg.innerText = data.error || "No booths found for this PIN.";
+            errorMsg.classList.remove('d-none');
+        }
+    } catch(e) {
+        loading.classList.add('d-none');
+        errorMsg.innerText = "Error connecting to server.";
+        errorMsg.classList.remove('d-none');
+    }
+});
+</script>
+{% endblock %}

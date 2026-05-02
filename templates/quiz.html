@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="glass-card p-5 animate-fade-in" id="quiz-container">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold"><i class="bi bi-patch-question-fill text-primary"></i> Voting Quiz</h2>
+                    <p class="text-muted">Test your knowledge about the election process in India!</p>
+                </div>
+
+                <div id="quiz-area">
+                    <h5 class="fw-bold mb-4" id="question-text"></h5>
+                    <div class="d-grid gap-3" id="options-area">
+                        <!-- Options will be injected here -->
+                    </div>
+                </div>
+
+                <div id="result-area" class="d-none text-center mt-4">
+                    <h3 class="fw-bold" id="score-text"></h3>
+                    <p class="text-muted" id="feedback-text"></p>
+                    <button class="btn btn-primary-custom mt-3" id="restart-btn"><i class="bi bi-arrow-counterclockwise"></i> Try Again</button>
+                    <a href="/" class="btn btn-outline-custom mt-3">Back to Home</a>
+                </div>
+
+                <div class="progress-custom mt-5">
+                    <div class="progress-bar-custom" id="quiz-progress" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const questions = [
+    {
+        q: "What is the minimum age to vote in India?",
+        options: ["16 Years", "18 Years", "21 Years", "25 Years"],
+        ans: 1
+    },
+    {
+        q: "Which document is primarily required to register as a voter?",
+        options: ["Form 6", "Form 8", "Aadhaar Card", "PAN Card"],
+        ans: 0
+    },
+    {
+        q: "Can Non-Resident Indians (NRIs) vote in Indian elections?",
+        options: ["No, never", "Yes, through online voting", "Yes, but they must be physically present at the booth", "Yes, through postal ballot only"],
+        ans: 2
+    },
+    {
+        q: "What does EVM stand for?",
+        options: ["Electronic Voting Machine", "Election Validation Mechanism", "Electoral Vote Monitor", "None of the above"],
+        ans: 0
+    }
+];
+
+let currentQ = 0;
+let score = 0;
+
+const questionText = document.getElementById('question-text');
+const optionsArea = document.getElementById('options-area');
+const resultArea = document.getElementById('result-area');
+const quizArea = document.getElementById('quiz-area');
+const progressBar = document.getElementById('quiz-progress');
+
+function loadQuestion() {
+    if (currentQ >= questions.length) {
+        showResults();
+        return;
+    }
+    
+    const q = questions[currentQ];
+    questionText.innerText = `Q${currentQ + 1}: ${q.q}`;
+    optionsArea.innerHTML = '';
+    
+    q.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-secondary text-start p-3 fw-bold rounded-3';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(index, btn);
+        optionsArea.appendChild(btn);
+    });
+    
+    progressBar.style.width = `${(currentQ / questions.length) * 100}%`;
+}
+
+function checkAnswer(selected, btn) {
+    const q = questions[currentQ];
+    const allBtns = optionsArea.querySelectorAll('button');
+    allBtns.forEach(b => b.disabled = true);
+    
+    if (selected === q.ans) {
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-success', 'text-white');
+        score++;
+    } else {
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-danger', 'text-white');
+        allBtns[q.ans].classList.remove('btn-outline-secondary');
+        allBtns[q.ans].classList.add('btn-success', 'text-white');
+    }
+    
+    setTimeout(() => {
+        currentQ++;
+        loadQuestion();
+    }, 1500);
+}
+
+function showResults() {
+    quizArea.classList.add('d-none');
+    resultArea.classList.remove('d-none');
+    progressBar.style.width = '100%';
+    
+    document.getElementById('score-text').innerText = `You scored ${score} out of ${questions.length}!`;
+    const feedback = document.getElementById('feedback-text');
+    
+    if(score === questions.length) {
+        feedback.innerText = "Excellent! You are a fully informed voter.";
+    } else if(score >= questions.length / 2) {
+        feedback.innerText = "Good job! A little more reading and you'll be an expert.";
+    } else {
+        feedback.innerText = "It's a learning process! Check out our guides to learn more.";
+    }
+}
+
+document.getElementById('restart-btn').addEventListener('click', () => {
+    currentQ = 0;
+    score = 0;
+    quizArea.classList.remove('d-none');
+    resultArea.classList.add('d-none');
+    loadQuestion();
+});
+
+// Init
+loadQuestion();
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5 animate-fade-in">
+        <h2 class="fw-bold"><i class="bi bi-file-earmark-check-fill text-info"></i> Document Guide</h2>
+        <p class="text-muted">Make sure you have the right ID before heading to the polling booth.</p>
+    </div>
+
+    <div class="row">
+        <!-- Valid Documents -->
+        <div class="col-lg-6 mb-4">
+            <div class="glass-card p-4 h-100 border-success border-2">
+                <h4 class="text-success fw-bold mb-4"><i class="bi bi-check-circle-fill"></i> Accepted Documents</h4>
+                <p class="text-muted small">You must carry any ONE of these original documents to vote:</p>
+                
+                <ul class="list-group list-group-flush bg-transparent">
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-person-vcard text-primary me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">Voter ID Card (EPIC)</strong>
+                            <small class="text-muted">The primary proof of registration.</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-upc-scan text-primary me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">Aadhaar Card</strong>
+                            <small class="text-muted">Widely accepted alternative ID.</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-car-front text-primary me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">Driving License</strong>
+                            <small class="text-muted">Smart card or booklet format.</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-credit-card-2-front text-primary me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">PAN Card</strong>
+                            <small class="text-muted">Permanent Account Number card.</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-passport text-primary me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">Indian Passport</strong>
+                            <small class="text-muted">Valid passport booklet.</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Invalid Documents -->
+        <div class="col-lg-6 mb-4">
+            <div class="glass-card p-4 h-100 border-danger border-2">
+                <h4 class="text-danger fw-bold mb-4"><i class="bi bi-x-circle-fill"></i> Not Accepted</h4>
+                <p class="text-muted small">These documents will NOT be accepted at the polling booth:</p>
+                
+                <ul class="list-group list-group-flush bg-transparent">
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-telephone-x text-danger me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">Photos on Phone</strong>
+                            <small class="text-muted">Digital photos of ID cards are invalid.</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-files text-danger me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">Photocopies</strong>
+                            <small class="text-muted">Only original documents are verified.</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-envelope-paper text-danger me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">Utility Bills</strong>
+                            <small class="text-muted">Electricity, water, or phone bills.</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item bg-transparent text-dark border-0 d-flex align-items-center">
+                        <i class="bi bi-bank text-danger me-3 fs-4"></i>
+                        <div>
+                            <strong class="d-block">Bank Passbooks without Photo</strong>
+                            <small class="text-muted">Passbooks must have an attested photo.</small>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="mt-4 p-3 bg-warning-subtle rounded-3 border border-warning">
+                    <h6 class="fw-bold text-dark"><i class="bi bi-exclamation-triangle"></i> Important Note</h6>
+                    <p class="small mb-0 text-dark">Your name on the ID must match the name on the electoral roll. Minor spelling mistakes are usually ignored if your identity can be established.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
