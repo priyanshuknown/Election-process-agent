@@ -185,7 +185,7 @@ def chat():
     from dotenv import load_dotenv
     
     # Load env vars
-    load_dotenv()
+    load_dotenv(override=True)
     
     # Try to initialize Gemini
     api_key = os.getenv("GEMINI_API_KEY")
