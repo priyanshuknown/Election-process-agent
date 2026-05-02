@@ -181,36 +181,65 @@ def chat():
     data = request.json
     message = data.get('message', '').lower()
     
-    # Simple Rule-based Dictionary
-    rules = {
-        "hello": "Hi there! I am VoteMate. How can I help you with the election process today?",
-        "hi": "Hello! I am VoteMate. Ask me anything about voting in India.",
-        "voter id": "To get a Voter ID, you need to fill Form 6. You can do this online at the NVSP portal or through the Voter Helpline App.",
-        "lost": "If you lost your Voter ID, you can apply for a duplicate one using Form 8 on the NVSP portal.",
-        "documents": "Valid documents include Voter ID (EPIC), Aadhaar Card, PAN Card, Driving License, Passport, etc. Want to see the full list in the Document Guide?",
-        "age": "You must be 18 years or older on the qualifying date (usually Jan 1st of the year) to be eligible to vote.",
-        "where to vote": "You can find your polling booth using your PIN code in our Polling Booth finder, or check your EPIC number on the Election Commission website.",
-        "nri": "NRIs can vote! They need to fill Form 6A to register as an overseas elector. However, they must be physically present at the polling booth to vote.",
-        "online voting": "Currently, India does not allow online voting. You must visit your designated polling booth to cast your vote.",
-        "first time": "Welcome, first-time voter! I recommend going to the 'Voting Journey' tab. It will guide you step-by-step from registration to voting day!"
-    }
+    import google.generativeai as genai
+    from dotenv import load_dotenv
     
-    response = "I'm not quite sure about that. Could you try rephrasing? You can ask me about 'voter ID', 'documents', 'age eligibility', or 'where to vote'."
+    # Load env vars
+    load_dotenv()
     
-    for key in rules:
-        if key in message:
-            response = rules[key]
-            
-            # Smart Suggestion logic
-            if key == "voter id" or key == "first time":
-                response += "||SUGGESTION:Go to Voting Journey"
-            elif key == "where to vote":
-                response += "||SUGGESTION:Go to Booth Finder"
-            elif key == "documents":
-                response += "||SUGGESTION:View Document Guide"
-            break
-            
-    return jsonify({"response": response})
+    # Try to initialize Gemini
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return jsonify({
+            "response": "I'm sorry, my advanced AI brain is currently offline (Missing API Key). Please set up your GEMINI_API_KEY to enable intelligent chatting!||SUGGESTION:Go to Voting Journey"
+        })
+        
+    try:
+        genai.configure(api_key=api_key)
+        
+        system_instruction = """
+        You are VoteMate, an intelligent, helpful, and friendly AI election assistant for Indian voters.
+        Your goal is to guide first-time voters and answer questions about the Indian election process.
+        
+        Current Context:
+        - It is currently May 2026.
+        - Ongoing Elections: West Bengal State Assembly (Phase 1-3 done, final phases remaining), Tamil Nadu State Assembly, Kerala State Assembly.
+        - Upcoming Elections: UP (2027), Punjab (2027), Gujarat (2027).
+        - Completed Elections: 2024 Lok Sabha (NDA won), Bihar (2025), Delhi (2025).
+        
+        Capabilities of this App:
+        - We have a "Timeline" page for election dates.
+        - We have a "Booth Finder" where users enter their 6-digit PIN code to find their polling booth.
+        - We have a "Voting Journey" step-by-step guide.
+        - We have a "Document Guide" for valid ID proofs (Voter ID, Aadhaar, PAN, Driving License, Passport).
+        
+        Rules:
+        - Be concise, direct, and conversational.
+        - If the user asks about timelines or results, use the context provided above.
+        - If the user asks how to find a polling booth, tell them to use the Booth Finder feature and enter their PIN code.
+        - Do not generate fake election results. If you don't know, say so.
+        
+        You can append one of the following exact strings at the VERY END of your response to suggest a quick link to the user:
+        ||SUGGESTION:Go to Voting Journey
+        ||SUGGESTION:Go to Booth Finder
+        ||SUGGESTION:View Document Guide
+        ||SUGGESTION:Check Timeline
+        
+        Only append ONE suggestion if it makes sense for the user's query.
+        """
+        
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            system_instruction=system_instruction
+        )
+        
+        response = model.generate_content(message)
+        return jsonify({"response": response.text})
+        
+    except Exception as e:
+        return jsonify({
+            "response": f"I experienced an error connecting to my AI brain. Please try again later. ({str(e)})"
+        })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
