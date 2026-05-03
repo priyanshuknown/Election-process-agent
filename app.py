@@ -3,7 +3,10 @@ import sqlite3
 from flask import Flask, render_template, request, jsonify, g
 
 import tempfile
+import functools
+from flask_compress import Compress
 app = Flask(__name__)
+Compress(app)
 DATABASE = os.path.join(tempfile.gettempdir(), 'votemate_database.db')
 
 def get_db():
@@ -18,6 +21,19 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+@app.after_request
+def add_security_and_efficiency_headers(response):
+    # Security Headers
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    
+    # Efficiency / Caching Headers for static assets
+    if request.path.startswith('/static/'):
+        response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
 
 def init_db():
     with app.app_context():
