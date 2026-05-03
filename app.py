@@ -9,7 +9,11 @@ app = Flask(__name__)
 Compress(app)
 DATABASE = os.path.join(tempfile.gettempdir(), 'votemate_database.db')
 
-def get_db():
+def get_db() -> sqlite3.Connection:
+    """
+    Retrieves the current active SQLite database connection.
+    Creates a new connection if one does not exist for the current context.
+    """
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
@@ -17,7 +21,10 @@ def get_db():
     return db
 
 @app.teardown_appcontext
-def close_connection(exception):
+def close_connection(exception: Exception | None):
+    """
+    Closes the SQLite database connection at the end of the request context.
+    """
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
@@ -29,13 +36,17 @@ def add_security_and_efficiency_headers(response):
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:;"
     
     # Efficiency / Caching Headers for static assets
     if request.path.startswith('/static/'):
         response.headers['Cache-Control'] = 'public, max-age=86400'
     return response
 
-def init_db():
+def init_db() -> None:
+    """
+    Initializes the SQLite database schema if it does not already exist.
+    """
     with app.app_context():
         db = get_db()
         db.execute('''
