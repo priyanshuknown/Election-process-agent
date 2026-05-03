@@ -2,8 +2,9 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, jsonify, g
 
+import tempfile
 app = Flask(__name__)
-DATABASE = 'database.db'
+DATABASE = os.path.join(tempfile.gettempdir(), 'votemate_database.db')
 
 def get_db():
     db = getattr(g, '_database', None)
